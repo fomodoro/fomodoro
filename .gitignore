@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+
+# Dependency directory
+node_modules
+
+# Debug log from npm
+npm-debug.log
+
+# local env variables
+.env
+
+# truffle
+build
+contracts/.placeholder
+test/.placeholder
+.node-xmlhttprequest-*
+
+# macOS
+.DS_Store
+
+# IntelliJ IDE
+.idea
+
+# VSCode
+.vscode
+

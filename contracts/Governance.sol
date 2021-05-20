@@ -3,6 +3,12 @@
 pragma solidity 0.8.4;
 
 contract Governance {
+    struct Vote {
+        uint power;
+        address voter;
+        uint actionKey;   
+    }
+
     struct Action {
         string name;
         address[] voter;
@@ -20,19 +26,47 @@ contract Governance {
     struct Space {
         bytes32 name;
         bytes32 symbol;
+        address tokenAddress;
         bytes32[] proposalList; 
     }
 
     bytes32[] public spaceList; // list of proposal keys so we can look them up
+    mapping(bytes32 => address) private spaceToOwner;
     mapping(bytes32 => Space) private spaceStructs; // random access by space key and proposal key
-    mapping (bytes32 => Proposal) private proposalStructs;     
-    mapping (bytes32 => Action) private actionStructs;
+    mapping(bytes32 => Proposal) private proposalStructs;     
+    mapping(bytes32 => Action) private actionStructs;
 
-    function newSpace(bytes32 _spaceKey, bytes32 _name, bytes32 _symbol) public returns (bool success) {
-        // Checking dups
+    modifier onlyOwnerOf(bytes32 _spaceKey) {
+        require (spaceToOwner[_spaceKey] == msg.sender);
+        _;
+    }
+
+    function getAllSpaces() external view returns (bytes32[] memory) {
+        return spaceList;
+    }
+
+    function newSpace(bytes32 _spaceKey, bytes32 _name, bytes32 _symbol, address _tokenAddress) external returns (bool success) {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
+        spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
         spaceList.push(_spaceKey);
+        spaceToOwner[_spaceKey] = msg.sender;
+        return true;
+    }
+
+    function updateSpace(
+        bytes32 _spaceKey,
+        bytes32 _name, 
+        bytes32 _symbol,
+        address _tokenAddress
+    )
+    external
+    onlyOwnerOf(_spaceKey)
+    returns (bool success) 
+    {
+        spaceStructs[_spaceKey].name = _name;
+        spaceStructs[_spaceKey].symbol = _symbol;
+        spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
         return true;
     }
 

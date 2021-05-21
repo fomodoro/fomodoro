@@ -2,6 +2,8 @@
 
 pragma solidity 0.8.4;
 
+import "./interfaces/IStrategy.sol";
+
 contract Governance {
     struct Vote {
         uint power;
@@ -28,6 +30,7 @@ contract Governance {
         bytes32 symbol;
         address tokenAddress;
         bytes32[] proposalList; 
+        IStrategy strategy;
     }
 
     bytes32[] public spaceList; // list of proposal keys so we can look them up
@@ -45,10 +48,20 @@ contract Governance {
         return spaceList;
     }
 
-    function newSpace(bytes32 _spaceKey, bytes32 _name, bytes32 _symbol, address _tokenAddress) external returns (bool success) {
+    function newSpace(
+        bytes32 _spaceKey,
+        bytes32 _name,
+        bytes32 _symbol,
+        address _tokenAddress,
+        IStrategy _strategy
+    )
+    external
+    returns (bool success)
+    {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
         spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
+        spaceStructs[_spaceKey].strategy = _strategy;
         spaceList.push(_spaceKey);
         spaceToOwner[_spaceKey] = msg.sender;
         return true;
@@ -58,7 +71,8 @@ contract Governance {
         bytes32 _spaceKey,
         bytes32 _name, 
         bytes32 _symbol,
-        address _tokenAddress
+        address _tokenAddress,
+        IStrategy _strategy
     )
     external
     onlyOwnerOf(_spaceKey)
@@ -67,6 +81,7 @@ contract Governance {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
         spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
+        spaceStructs[_spaceKey].strategy = _strategy;
         return true;
     }
 

@@ -6,41 +6,36 @@ import "./interfaces/IStrategy.sol";
 
 contract Governance {
     struct Vote {
-        uint power;
+        uint256 power;
         address voter;
-        uint actionKey;   
-    }
-
-    struct Action {
-        string name;
-        address[] voter;
+        uint256 choiceIndex;
     }
 
     struct Proposal {
-        bytes32 title;
-        string detail;
-        uint startTime;
-        uint endTime;
-        uint blockNumber;
-        bytes32[] actionList;
+        string txHash;
+        uint256 startTime;
+        uint256 endTime;
+        uint256 blockNumber;
+        uint256 numberOfChoices;
+        bytes32[] voteList;
     }
 
     struct Space {
         bytes32 name;
         bytes32 symbol;
         address tokenAddress;
-        bytes32[] proposalList; 
+        bytes32[] proposalList;
         IStrategy strategy;
     }
 
     bytes32[] public spaceList; // list of proposal keys so we can look them up
     mapping(bytes32 => address) private spaceToOwner;
     mapping(bytes32 => Space) private spaceStructs; // random access by space key and proposal key
-    mapping(bytes32 => Proposal) private proposalStructs;     
-    mapping(bytes32 => Action) private actionStructs;
+    mapping(bytes32 => Proposal) private proposalStructs;
+    mapping(bytes32 => Vote) private voteStructs;
 
     modifier onlyOwnerOf(bytes32 _spaceKey) {
-        require (spaceToOwner[_spaceKey] == msg.sender);
+        require(spaceToOwner[_spaceKey] == msg.sender);
         _;
     }
 
@@ -54,10 +49,7 @@ contract Governance {
         bytes32 _symbol,
         address _tokenAddress,
         IStrategy _strategy
-    )
-    external
-    returns (bool success)
-    {
+    ) external returns (bool success) {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
         spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
@@ -69,15 +61,11 @@ contract Governance {
 
     function updateSpace(
         bytes32 _spaceKey,
-        bytes32 _name, 
+        bytes32 _name,
         bytes32 _symbol,
         address _tokenAddress,
         IStrategy _strategy
-    )
-    external
-    onlyOwnerOf(_spaceKey)
-    returns (bool success) 
-    {
+    ) external onlyOwnerOf(_spaceKey) returns (bool success) {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
         spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
@@ -89,19 +77,33 @@ contract Governance {
         return spaceStructs[_spaceKey];
     }
 
-    function newProposal() public {
-
+    function newProposal(
+        bytes32 _spaceKey,
+        bytes32 _proposalId,
+        string memory _txHash,
+        uint256 _startTime,
+        uint256 _endTime,
+        uint256 _blockNumber,
+        uint8 _numberOfChoices
+    ) public {
+        require(spaceStructs[_spaceKey].tokenAddress != address(0));
+        proposalStructs[_proposalId].txHash = _txHash;
+        proposalStructs[_proposalId].startTime = _startTime;
+        proposalStructs[_proposalId].endTime = _endTime;
+        proposalStructs[_proposalId].blockNumber = _blockNumber;
+        proposalStructs[_proposalId].numberOfChoices = _numberOfChoices;
+        spaceStructs[_spaceKey].proposalList.push(_proposalId);
     }
 
-    function getProposal() public {
-
+    function getProposal(bytes32 _proposalId)
+        public
+        view
+        returns (Proposal memory)
+    {
+        return proposalStructs[_proposalId];
     }
 
-    function getVotes() public {
+    function getVotes() public {}
 
-    }
-
-    function vote() public payable {
-
-    }
+    function vote() public payable {}
 }

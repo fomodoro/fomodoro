@@ -89,13 +89,14 @@ contract Governance {
         uint256 _blockNumber,
         uint8 _numberOfChoices
     ) public {
-        require(spaceStructs[_spaceKey].tokenAddress != address(0));
+        // require(spaceStructs[_spaceKey].tokenAddress != address(0));
+
         proposalStructs[_proposalId].txHash = _txHash;
         proposalStructs[_proposalId].startTime = _startTime;
         proposalStructs[_proposalId].endTime = _endTime;
         proposalStructs[_proposalId].blockNumber = _blockNumber;
         proposalStructs[_proposalId].numberOfChoices = _numberOfChoices;
-        spaceStructs[_spaceKey].proposalList.push(_proposalId);
+        // spaceStructs[_spaceKey].proposalList.push(_proposalId);
         proposalToSpace[_proposalId] = spaceStructs[_spaceKey];
     }
 
@@ -107,7 +108,7 @@ contract Governance {
     //     return proposalStructs[_proposalId];
     // }
 
-    function getVotes() public {}
+    // function getVotes() public {}
 
     function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {
         // check if voted 
@@ -124,6 +125,5 @@ contract Governance {
         proposalStructs[_proposalId].voterList.push(voter);
         proposalStructs[_proposalId].voteCount += voter.power;
         voted[msg.sender][_proposalId] = true;
-
     }
 }

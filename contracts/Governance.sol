@@ -33,7 +33,7 @@ contract Governance {
     mapping(bytes32 => address) private spaceToOwner;
     mapping(bytes32 => Space) private spaceStructs; // random access by space key and proposal key
     mapping(bytes32 => Proposal) private proposalStructs; // proposalId => Proposal
-    mapping(address => mapping(bytes32 => bool)) private voted; // check if address has voted for a proposal
+    mapping(bytes32 => bool) private voted; // check if address has voted for a proposal by hash(address, proposalId)
     mapping(bytes32 => Space) private proposalToSpace; // proposalId => space contains that proposal
 
     modifier onlyOwnerOf(bytes32 _spaceKey) {
@@ -101,7 +101,7 @@ contract Governance {
 
     function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {
         // check if voted 
-        require(voted[msg.sender][_proposalId] == true, "Already voted");
+        require(voted[keccak256(abi.encodePacked(msg.sender, _proposalId))] == true, "Already voted");
 
         // TODO: check ended
         
@@ -113,6 +113,6 @@ contract Governance {
         Voter memory voter = Voter(power, msg.sender, choiceIndex);
         proposalStructs[_proposalId].voterList.push(voter);
         proposalStructs[_proposalId].voteCount += voter.power;
-        voted[msg.sender][_proposalId] = true;
+        voted[keccak256(abi.encodePacked(msg.sender, _proposalId))] = true;
     }
 }

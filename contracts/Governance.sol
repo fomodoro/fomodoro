@@ -33,7 +33,6 @@ contract Governance {
     mapping(bytes32 => address) private spaceToOwner;
     mapping(bytes32 => Space) private spaceStructs; // random access by space key and proposal key
     mapping(bytes32 => Proposal) private proposalStructs; // proposalId => Proposal
-    // mapping(bytes32 => Voter) private voteStructs;
     mapping(address => mapping(bytes32 => bool)) private voted; // check if address has voted for a proposal
     mapping(bytes32 => Space) private proposalToSpace; // proposalId => space contains that proposal
 
@@ -99,16 +98,6 @@ contract Governance {
         // spaceStructs[_spaceKey].proposalList.push(_proposalId);
         proposalToSpace[_proposalId] = spaceStructs[_spaceKey];
     }
-
-    // function getProposal(bytes32 _proposalId)
-    //     public
-    //     view
-    //     returns (Proposal memory)
-    // {
-    //     return proposalStructs[_proposalId];
-    // }
-
-    // function getVotes() public {}
 
     function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {
         // check if voted 

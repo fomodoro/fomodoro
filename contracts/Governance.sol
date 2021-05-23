@@ -5,7 +5,7 @@ pragma solidity 0.8.4;
 import "./interfaces/IStrategy.sol";
 
 contract Governance {
-    struct Vote {
+    struct Voter {
         uint256 power;
         address voter;
         uint256 choiceIndex;
@@ -17,7 +17,8 @@ contract Governance {
         uint256 endTime;
         uint256 blockNumber;
         uint256 numberOfChoices;
-        bytes32[] voteList;
+        uint256 voteCount;
+        Voter[] voterList;
     }
 
     struct Space {
@@ -31,8 +32,10 @@ contract Governance {
     bytes32[] public spaceList; // list of proposal keys so we can look them up
     mapping(bytes32 => address) private spaceToOwner;
     mapping(bytes32 => Space) private spaceStructs; // random access by space key and proposal key
-    mapping(bytes32 => Proposal) private proposalStructs;
-    mapping(bytes32 => Vote) private voteStructs;
+    mapping(bytes32 => Proposal) private proposalStructs; // proposalId => Proposal
+    // mapping(bytes32 => Voter) private voteStructs;
+    mapping(address => mapping(bytes32 => bool)) private voted; // check if address has voted for a proposal
+    mapping(bytes32 => Space) private proposalToSpace; // proposalId => space contains that proposal
 
     modifier onlyOwnerOf(bytes32 _spaceKey) {
         require(spaceToOwner[_spaceKey] == msg.sender);
@@ -93,17 +96,34 @@ contract Governance {
         proposalStructs[_proposalId].blockNumber = _blockNumber;
         proposalStructs[_proposalId].numberOfChoices = _numberOfChoices;
         spaceStructs[_spaceKey].proposalList.push(_proposalId);
+        proposalToSpace[_proposalId] = spaceStructs[_spaceKey];
     }
 
-    function getProposal(bytes32 _proposalId)
-        public
-        view
-        returns (Proposal memory)
-    {
-        return proposalStructs[_proposalId];
-    }
+    // function getProposal(bytes32 _proposalId)
+    //     public
+    //     view
+    //     returns (Proposal memory)
+    // {
+    //     return proposalStructs[_proposalId];
+    // }
 
     function getVotes() public {}
 
-    function vote() public payable {}
+    function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {
+        // check if voted 
+        require(voted[msg.sender][_proposalId] == true, "Already voted");
+
+        // TODO: check ended
+        
+        // get voting power
+        uint256 power = 10;
+        // uint256 power = proposalToSpace[_proposalId].strategy.getVotingPower(msg.sender);
+
+        // vote
+        Voter memory voter = Voter(power, msg.sender, choiceIndex);
+        proposalStructs[_proposalId].voterList.push(voter);
+        proposalStructs[_proposalId].voteCount += voter.power;
+        voted[msg.sender][_proposalId] = true;
+
+    }
 }

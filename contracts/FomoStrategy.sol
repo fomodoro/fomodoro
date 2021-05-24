@@ -2,13 +2,13 @@
 
 pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/IBEP20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FomoStrategy is Ownable {
-    IERC20 token;
+    IBEP20 token;
 
-    function updateToken(IERC20 _token) external onlyOwner returns (bool success) {
+    function updateToken(IBEP20 _token) external onlyOwner returns (bool success) {
        token = _token;
        return true;
     }

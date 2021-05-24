@@ -3,17 +3,10 @@
 pragma solidity 0.8.4;
 
 import "./interfaces/IBEP20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IStrategy.sol";
 
-contract FomoStrategy is Ownable {
-    IBEP20 token;
-
-    function updateToken(IBEP20 _token) external onlyOwner returns (bool success) {
-       token = _token;
-       return true;
-    }
-
-    function getVotingPower(address _account) external view returns (uint) {
-        return token.balanceOf(_account);
+contract FomoStrategy is IStrategy {
+    function getVotingPower(address _account, IBEP20 _token) external view override returns (uint) {
+        return _token.balanceOf(_account);
     }
 }

@@ -3,6 +3,7 @@
 pragma solidity 0.8.4;
 
 import "./interfaces/IStrategy.sol";
+import "./interfaces/IBEP20.sol";
 
 contract Governance {
     struct Voter {
@@ -24,9 +25,9 @@ contract Governance {
     struct Space {
         bytes32 name;
         bytes32 symbol;
-        address tokenAddress;
-        bytes32[] proposalList;
+        IBEP20 token;
         IStrategy strategy;
+        bytes32[] proposalList;
     }
 
     bytes32[] public spaceList; // list of proposal keys so we can look them up
@@ -49,12 +50,12 @@ contract Governance {
         bytes32 _spaceKey,
         bytes32 _name,
         bytes32 _symbol,
-        address _tokenAddress,
+        IBEP20 _token,
         IStrategy _strategy
     ) external returns (bool success) {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
-        spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
+        spaceStructs[_spaceKey].token = _token;
         spaceStructs[_spaceKey].strategy = _strategy;
         spaceList.push(_spaceKey);
         spaceToOwner[_spaceKey] = msg.sender;
@@ -65,12 +66,12 @@ contract Governance {
         bytes32 _spaceKey,
         bytes32 _name,
         bytes32 _symbol,
-        address _tokenAddress,
+        IBEP20 _token,
         IStrategy _strategy
     ) external onlyOwnerOf(_spaceKey) returns (bool success) {
         spaceStructs[_spaceKey].name = _name;
         spaceStructs[_spaceKey].symbol = _symbol;
-        spaceStructs[_spaceKey].tokenAddress = _tokenAddress;
+        spaceStructs[_spaceKey].token = _token;
         spaceStructs[_spaceKey].strategy = _strategy;
         return true;
     }

@@ -76,8 +76,16 @@ contract Governance {
         return true;
     }
 
-    function getSpace(bytes32 _spaceKey) public view returns (Space memory) {
+    function getSpace(bytes32 _spaceKey) external view returns (Space memory) {
         return spaceStructs[_spaceKey];
+    }
+
+    function getProposals(bytes32 _spaceKey) external view returns (bytes32[] memory) {
+        return spaceStructs[_spaceKey].proposalList;
+    }
+
+    function getProposal(bytes32 _proposalKey) external view returns (Proposal memory) {
+        return proposalStructs[_proposalKey];
     }
 
     function newProposal(
@@ -96,8 +104,9 @@ contract Governance {
         proposalStructs[_proposalId].endTime = _endTime;
         proposalStructs[_proposalId].blockNumber = _blockNumber;
         proposalStructs[_proposalId].numberOfChoices = _numberOfChoices;
-        // spaceStructs[_spaceKey].proposalList.push(_proposalId);
         proposalToSpace[_proposalId] = spaceStructs[_spaceKey];
+
+        spaceStructs[_spaceKey].proposalList.push(_proposalId);
     }
 
     function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {

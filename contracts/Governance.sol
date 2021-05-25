@@ -36,7 +36,7 @@ contract Governance {
     mapping(bytes32 => Proposal) private proposalStructs; // proposalId => Proposal
     mapping(bytes32 => Voter) private voterStructs;
     mapping(bytes32 => bool) private voted; // check if address has voted for a proposal by hash(address, proposalId)
-    mapping(bytes32 => Space) private proposalToSpace; // proposalId => space contains that proposal
+    mapping(bytes32 => bytes32) private proposalToSpace; // proposalId => space contains that proposal
 
     modifier onlyOwnerOf(bytes32 _spaceKey) {
         require(spaceToOwner[_spaceKey] == msg.sender);
@@ -105,7 +105,7 @@ contract Governance {
         proposalStructs[_proposalId].endTime = _endTime;
         proposalStructs[_proposalId].blockNumber = _blockNumber;
         proposalStructs[_proposalId].numberOfChoices = _numberOfChoices;
-        proposalToSpace[_proposalId] = spaceStructs[_spaceKey];
+        proposalToSpace[_proposalId] = _spaceKey;
 
         spaceStructs[_spaceKey].proposalList.push(_proposalId);
     }
@@ -121,8 +121,10 @@ contract Governance {
         // TODO: check ended
         
         // get voting power
-        uint256 power = 10;
-        // uint256 power = proposalToSpace[_proposalId].strategy.getVotingPower(msg.sender);
+        // bytes32 spaceKey = proposalToSpace[_proposalId];
+        // Space memory space = spaceStructs[spaceKey];
+        // uint256 power = space.strategy.getVotingPower(msg.sender, space.token);
+        uint power = 10;
 
         // vote
         Voter memory voter = Voter(power, msg.sender, choiceIndex);

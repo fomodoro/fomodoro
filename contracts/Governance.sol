@@ -111,7 +111,7 @@ contract Governance {
 
     function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {
         // check if voted 
-        require(voted[keccak256(abi.encodePacked(msg.sender, _proposalId))] == true, "Already voted");
+        require(voted[keccak256(abi.encodePacked(msg.sender, _proposalId))] == false, "Already voted");
 
         // TODO: check ended
         

@@ -97,15 +97,12 @@ contract Governance {
         uint256 _blockNumber,
         uint8 _numberOfChoices
     ) public {
-        // require(spaceStructs[_spaceKey].tokenAddress != address(0));
-
         proposalStructs[_proposalId].txHash = _txHash;
         proposalStructs[_proposalId].startTime = _startTime;
         proposalStructs[_proposalId].endTime = _endTime;
         proposalStructs[_proposalId].blockNumber = _blockNumber;
         proposalStructs[_proposalId].numberOfChoices = _numberOfChoices;
         proposalToSpace[_proposalId] = _spaceKey;
-
         spaceStructs[_spaceKey].proposalList.push(_proposalId);
     }
 
@@ -121,8 +118,6 @@ contract Governance {
         bytes32 spaceKey = proposalToSpace[_proposalId];
         Space memory space = spaceStructs[spaceKey];
         uint256 power = space.strategy.getVotingPower(msg.sender, space.token);
-        // Space memory space = proposalToSpace[_proposalId];
-        // uint256 power = space.strategy.getVotingPower(msg.sender, space.token);
 
         // vote
         Voter memory voter = Voter(power, msg.sender, choiceIndex);

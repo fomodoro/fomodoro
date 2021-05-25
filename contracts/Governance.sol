@@ -18,8 +18,7 @@ contract Governance {
         uint256 endTime;
         uint256 blockNumber;
         uint256 numberOfChoices;
-        uint256 voteCount;
-        Voter[] voterList;
+        bytes32[] voterList;
     }
 
     struct Space {
@@ -114,22 +113,22 @@ contract Governance {
         return voterStructs[_voterKey];
     }
 
-    function vote(bytes32 _proposalId, uint256 choiceIndex) public payable {
+    function vote(bytes32 _proposalId, uint256 choiceIndex) external {
         // check if voted 
         require(voted[keccak256(abi.encodePacked(msg.sender, _proposalId))] == false, "Already voted");
 
-        // TODO: check ended
-        
         // get voting power
-        // bytes32 spaceKey = proposalToSpace[_proposalId];
-        // Space memory space = spaceStructs[spaceKey];
+        bytes32 spaceKey = proposalToSpace[_proposalId];
+        Space memory space = spaceStructs[spaceKey];
+        uint256 power = space.strategy.getVotingPower(msg.sender, space.token);
+        // Space memory space = proposalToSpace[_proposalId];
         // uint256 power = space.strategy.getVotingPower(msg.sender, space.token);
-        uint power = 10;
 
         // vote
         Voter memory voter = Voter(power, msg.sender, choiceIndex);
-        proposalStructs[_proposalId].voterList.push(voter);
-        proposalStructs[_proposalId].voteCount += voter.power;
+        bytes32 voteId = bytes32(keccak256(abi.encodePacked(msg.sender, _proposalId)));
+        voterStructs[voteId] = voter;
+        proposalStructs[_proposalId].voterList.push(voteId);
         voted[keccak256(abi.encodePacked(msg.sender, _proposalId))] = true;
     }
 }
